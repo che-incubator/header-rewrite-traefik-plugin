@@ -77,7 +77,7 @@ jobs:
           DOCKER_IMAGE=${{secrets.DOCKER_IMAGE}}
           DOCKER_IMAGE=${DOCKER_IMAGE:-$GITHUB_REPOSITORY}
           DOCKER_REPO=${{secrets.DOCKER_REPO}}
-          DOCKER_PLATFORMS=linux/amd64
+          DOCKER_PLATFORMS=linux/amd64,linux/s390x,linux/arm64,linux/ppc64le
           VERSION=latest
 
           if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -96,12 +96,6 @@ jobs:
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --build-arg VCS_REF=${GITHUB_SHA::8} \
             ${TAGS} --file build/dockerfiles/Dockerfile .
-
-          echo ::set-output name=buildx_args_rhel::--platform linux/amd64 \
-            --build-arg VERSION=${VERSION} \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg VCS_REF=${GITHUB_SHA::8} \
-            ${TAGS_RHEL} --file build/dockerfiles/rhel.Dockerfile .
       -
         name: Set up Docker Buildx
         uses: crazy-max/ghaction-docker-buildx@v3.2.0
@@ -123,11 +117,6 @@ jobs:
         if: success() && github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || startsWith(github.ref, 'refs/tags/'))
         run: |
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
-      -
-        name: Docker Buildx rhel (push)
-        if: success() && github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || startsWith(github.ref, 'refs/tags/'))
-        run: |
-          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args_rhel }}
       -
         name: Docker Check Manifest
         if: success() && github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || startsWith(github.ref, 'refs/tags/'))
