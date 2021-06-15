@@ -1,113 +1,78 @@
+//
+// Copyright (c) 2021 Red Hat, Inc.
+// This program and the accompanying materials are made
+// available under the terms of the Eclipse Public License 2.0
+// which is available at https://www.eclipse.org/legal/epl-2.0/
+//
+// SPDX-License-Identifier: EPL-2.0
+//
+// Contributors:
+//   Red Hat, Inc. - initial API and implementation
+//
 package main
 
 import (
-    "flag"
-    "fmt"
-    "gopkg.in/yaml.v3"
-    "io/ioutil"
-    "log"
-    "net/http"
-    "net/http/httputil"
-    "net/url"
+	"flag"
+	"fmt"
+	"gopkg.in/yaml.v3"
+	"header-rewrite-proxy/pkg/proxy"
+	"io/ioutil"
+	"log"
+	"net/url"
 )
 
-type ProxyHandler struct {
-    p *httputil.ReverseProxy
-}
-
-type Conf struct {
-    upstream  *url.URL
-    bind      string
-    rulesConf string
-    rules     *Rules
-}
-
-type Rules struct {
-    Rules []Rule `yaml:"rules"`
-}
-
-type Rule struct {
-    From         string `yaml:"from"`
-    To           string `yaml:"to"`
-    Prefix       string `yaml:"prefix"`
-    KeepOriginal bool   `yaml:"keep-original"`
-}
-
-var conf *Conf
-
 func main() {
-    parsedConf, err := parseConfig()
-    if err != nil {
-        panic(err)
-    }
-    conf = parsedConf
+	parsedConf, err := parseConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    proxy := httputil.NewSingleHostReverseProxy(conf.upstream)
-    http.Handle("/", &ProxyHandler{proxy})
-    log.Printf("Listening on '%s' ...\n", conf.bind)
-    err = http.ListenAndServe(conf.bind, nil)
-    if err != nil {
-        panic(err)
-    }
-}
-func (ph *ProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    for _, rule := range conf.rules.Rules {
-        headerValue := r.Header.Get(rule.From)
-        if headerValue != "" {
-            if len(rule.Prefix) > 0 {
-                headerValue = rule.Prefix + headerValue
-            }
-            r.Header.Set(rule.To, headerValue)
-            if !rule.KeepOriginal {
-                r.Header.Del(rule.From)
-            }
-        }
-    }
-
-    ph.p.ServeHTTP(w, r)
+	if err := proxy.Serve(parsedConf); err != nil {
+		log.Fatal(err)
+	}
 }
 
-func parseConfig() (*Conf, error) {
-    conf := Conf{}
-    upstream := ""
-    flag.StringVar(&upstream, "upstream", "", "Full url to upstream application.")
-    flag.StringVar(&conf.bind, "bind", ":8080", "Listen on. Default ':8080'")
-    flag.StringVar(&conf.rulesConf, "rules", "rules.yaml", "Path to rules file. Default 'rules.yaml'")
+func parseConfig() (*proxy.Conf, error) {
+	conf := proxy.Conf{}
+	upstream := ""
+	flag.StringVar(&upstream, "upstream", "", "Full url to upstream application. Mandatory!")
+	flag.StringVar(&conf.Bind, "bind", ":8080", "Listen on.")
+	flag.StringVar(&conf.RulesConf, "rules", "rules.yaml", "Path to rules file.")
 
-    flag.Parse()
+	flag.Parse()
 
-    // verify, parse and set upstream
-    if upstream == "" {
-        return nil, fmt.Errorf("upstream parameter must be set")
-    }
-    upstreamUrl, err := url.Parse(upstream)
-    if err != nil {
-        return nil, err
-    }
-    conf.upstream = upstreamUrl
+	// verify, parse and set upstream
+	if upstream == "" {
+		return nil, fmt.Errorf("upstream parameter must be set")
+	}
+	upstreamUrl, err := url.Parse(upstream)
+	if err != nil {
+		return nil, err
+	}
+	conf.Upstream = upstreamUrl
 
-    // read rules file
-    parsedRules, err := readRulesConf(conf.rulesConf)
-    if err != nil {
-        return nil, err
-    }
-    conf.rules = parsedRules
-    log.Printf("Using rules: '%+v'", conf.rules)
+	// read rules file
+	parsedRules, err := readRulesConf(conf.RulesConf)
+	if err != nil {
+		return nil, err
+	}
+	conf.Rules = parsedRules
+	log.Printf("Using rules: '%+v'", conf.Rules)
 
-    return &conf, nil
+	return &conf, nil
 }
 
-func readRulesConf(filename string) (*Rules, error) {
-    buf, err := ioutil.ReadFile(filename)
-    if err != nil {
-        return nil, err
-    }
+func readRulesConf(filename string) (*proxy.Rules, error) {
+	buf, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
 
-    rules := &Rules{}
-    err = yaml.Unmarshal(buf, rules)
-    if err != nil {
-        return nil, fmt.Errorf("in file %q: %v", filename, err)
-    }
+	rules := &proxy.Rules{}
+	err = yaml.Unmarshal(buf, rules)
+	if err != nil {
+		return nil, fmt.Errorf("in file %q: %v", filename, err)
+	}
 
-    return rules, nil
+	return rules, nil
 }
