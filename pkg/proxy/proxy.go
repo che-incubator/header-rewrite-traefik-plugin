@@ -33,21 +33,24 @@ func Serve(conf *Conf) error {
 }
 
 func (proxyHandler *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    rewriteHeaders(&r.Header, proxyHandler.conf.Rules)
+	rewriteHeaders(&r.Header, proxyHandler.conf.Rules)
 	proxyHandler.proxy.ServeHTTP(w, r)
 }
 
 func rewriteHeaders(headers *http.Header, rules *Rules) {
-    for _, rule := range rules.Rules {
-        headerValue := headers.Get(rule.From)
-        if headerValue != "" {
-            if len(rule.Prefix) > 0 {
-                headerValue = rule.Prefix + headerValue
-            }
-            headers.Set(rule.To, headerValue)
-            if !rule.KeepOriginal {
-                headers.Del(rule.From)
-            }
-        }
-    }
+	for _, rule := range rules.Rules {
+		headerValues := headers.Values(rule.From)
+		for _, headerValue := range headerValues {
+			if headerValue != "" {
+				if len(rule.Prefix) > 0 {
+					headerValue = rule.Prefix + headerValue
+				}
+				headers.Add(rule.To, headerValue)
+			}
+		}
+
+		if !rule.KeepOriginal {
+			headers.Del(rule.From)
+		}
+	}
 }
