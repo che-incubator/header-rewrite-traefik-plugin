@@ -40,6 +40,9 @@ func (proxyHandler *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func rewriteHeaders(headers *http.Header, rules *Rules) {
 	for _, rule := range rules.Rules {
 		headerValues := headers.Values(rule.From)
+		if !rule.KeepOriginalTarget {
+			headers.Del(rule.To)
+		}
 		for _, headerValue := range headerValues {
 			if headerValue != "" {
 				if len(rule.Prefix) > 0 {

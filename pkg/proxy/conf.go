@@ -25,8 +25,9 @@ type Rules struct {
 }
 
 type Rule struct {
-	From         string `yaml:"from"`
-	To           string `yaml:"to"`
-	Prefix       string `yaml:"prefix"`
-	KeepOriginal bool   `yaml:"keep-original"`
+	From               string `yaml:"from"`
+	To                 string `yaml:"to"`
+	Prefix             string `yaml:"prefix"`
+	KeepOriginal       bool   `yaml:"keep-original"`
+	KeepOriginalTarget bool   `yaml:"keep-original-to"`
 }
