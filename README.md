@@ -31,11 +31,13 @@ Usage of ./main:
 ```
 
 ### Rules
-Rewrite rules are configured with yaml file in format:
+Rewrite rules are configured with yaml file in format
+(see https://github.com/che-incubator/header-rewrite-proxy/blob/main/pkg/proxy/conf.go):
 ```.yaml
 rules:
 - from: X-Header-Key-From
   to: X-Header-Key-To
   prefix: 'Prefix of header value '
   keep-original: false
+  keep-original-target: false
 ```
