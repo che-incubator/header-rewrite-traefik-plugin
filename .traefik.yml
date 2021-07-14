@@ -1,0 +1,10 @@
+displayName: HeaderRewriteProxy
+summary: Modify http headers
+type: middleware
+import: github.com/che-incubator/header-rewrite-proxy
+compatibility: TODO
+testData:
+  from: X-Forwarded-Access-Token
+  to: Authorization
+  prefix: 'Bearer '
+  keepOriginal: false
