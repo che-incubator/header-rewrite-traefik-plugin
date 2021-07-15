@@ -1,4 +1,3 @@
-// Package proxy
 // Copyright (c) 2021 Red Hat, Inc.
 // This program and the accompanying materials are made
 // available under the terms of the Eclipse Public License 2.0
@@ -9,7 +8,7 @@
 // Contributors:
 //   Red Hat, Inc. - initial API and implementation
 //
-package proxy
+package header_rewrite_proxy
 
 import (
 	"net/http"
@@ -20,14 +19,12 @@ func TestHeaderRewritten(t *testing.T) {
 	headers := &http.Header{}
 	headers.Add("hello", "world")
 
-	rewriteHeaders(headers, &Rules{Rules: []Rule{
-		{
-			From:         "hello",
-			To:           "goodbye",
-			Prefix:       "",
-			KeepOriginal: true,
-		},
-	}})
+	rewriteHeaders(headers, &Config{
+		From:         "hello",
+		To:           "goodbye",
+		Prefix:       "",
+		KeepOriginal: true,
+	})
 
 	if headers.Get("goodbye") != "world" {
 		t.Errorf("header 'hello' should be rewritten to new key 'goodbye'")
@@ -41,14 +38,12 @@ func TestKeepOriginal(t *testing.T) {
 	headers := &http.Header{}
 	headers.Add("hello", "world")
 
-	rewriteHeaders(headers, &Rules{Rules: []Rule{
-		{
-			From:         "hello",
-			To:           "goodbye",
-			Prefix:       "",
-			KeepOriginal: false,
-		},
-	}})
+	rewriteHeaders(headers, &Config{
+		From:         "hello",
+		To:           "goodbye",
+		Prefix:       "",
+		KeepOriginal: false,
+	})
 
 	if headers.Get("goodbye") != "world" {
 		t.Errorf("header 'hello' should be rewritten to new key 'goodbye'")
@@ -63,14 +58,12 @@ func TestPrefix(t *testing.T) {
 	headers := &http.Header{}
 	headers.Add("hello", "world")
 
-	rewriteHeaders(headers, &Rules{Rules: []Rule{
-		{
-			From:         "hello",
-			To:           "goodbye",
-			Prefix:       "prefix ",
-			KeepOriginal: true,
-		},
-	}})
+	rewriteHeaders(headers, &Config{
+		From:         "hello",
+		To:           "goodbye",
+		Prefix:       "prefix ",
+		KeepOriginal: true,
+	})
 
 	if headers.Get("goodbye") != "prefix world" {
 		t.Errorf("header 'hello' should be rewritten to new key 'goodbye'")
@@ -86,14 +79,12 @@ func TestMultipleValuesUnderSameKey(t *testing.T) {
 	headers.Add("hello", "world")
 	headers.Add("hello", "there")
 
-	rewriteHeaders(headers, &Rules{Rules: []Rule{
-		{
-			From:         "hello",
-			To:           "goodbye",
-			Prefix:       "prefix ",
-			KeepOriginal: false,
-		},
-	}})
+	rewriteHeaders(headers, &Config{
+		From:         "hello",
+		To:           "goodbye",
+		Prefix:       "prefix ",
+		KeepOriginal: false,
+	})
 
 	headersResult := headers.Values("goodbye")
 
@@ -119,13 +110,11 @@ func TestKeepOriginalTarget(t *testing.T) {
 	headers.Add("hello", "world")
 	headers.Add("goodbye", "there")
 
-	rewriteHeaders(headers, &Rules{Rules: []Rule{
-		{
-			From:               "hello",
-			To:                 "goodbye",
-			KeepOriginalTarget: true,
-		},
-	}})
+	rewriteHeaders(headers, &Config{
+		From:               "hello",
+		To:                 "goodbye",
+		KeepOriginalTarget: true,
+	})
 
 	headersResult := headers.Values("goodbye")
 
@@ -147,13 +136,11 @@ func TestNotKeepOriginalTarget(t *testing.T) {
 	headers.Add("hello", "world")
 	headers.Add("goodbye", "there")
 
-	rewriteHeaders(headers, &Rules{Rules: []Rule{
-		{
-			From:               "hello",
-			To:                 "goodbye",
-			KeepOriginalTarget: false,
-		},
-	}})
+	rewriteHeaders(headers, &Config{
+		From:               "hello",
+		To:                 "goodbye",
+		KeepOriginalTarget: false,
+	})
 
 	headersResult := headers.Values("goodbye")
 
