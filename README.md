@@ -38,6 +38,11 @@ http:
           from: X-Forwarded-Access-Token
           to: Authorization
           prefix: 'Bearer '
-          keepOriginal: true
-          keepOriginalTarget: false
+          keepOriginal: false
+          keepOriginalTarget: true
 ```
+
+In this example, when there is `X-Forwarded-Access-Token` header, it's values will be moved
+into `Authorization` header with `Bearer ` as a value prefix. The `X-Forwarded-Access-Token` header
+will be removed (`keepOriginal: false`) and if there were any values in `Authorization` header, they
+will stay there (`keepOriginalTarget: true`).
