@@ -31,6 +31,7 @@ func TestHeaderRewritten(t *testing.T) {
 	}
 
 	if headers.Get("hello") != "world" {
+		t.Errorf("Original header should not be rewritten.")
 	}
 }
 
