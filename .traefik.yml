@@ -1,5 +1,6 @@
 displayName: Header Rewrite
-summary: Modify http headers
+summary: Plugin that can rewrite http headers with given rules. Part of Eclipse Che project.
+iconPath: icon.svg
 type: middleware
 import: github.com/che-incubator/header-rewrite-traefik-plugin
 testData:
