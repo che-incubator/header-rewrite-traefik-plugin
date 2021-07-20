@@ -8,7 +8,7 @@
 // Contributors:
 //   Red Hat, Inc. - initial API and implementation
 //
-package header_rewrite_traefik_plugin
+package header_rewrite
 
 import (
 	"context"

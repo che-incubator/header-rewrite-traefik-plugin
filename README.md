@@ -21,7 +21,7 @@ Traefik static configuration for local plugin:
 ...
 experimental:
   localPlugins:
-    header-rewrite-traefik-plugin:
+    header-rewrite:
       moduleName: github.com/che-incubator/header-rewrite-traefik-plugin
 ```
 
@@ -34,7 +34,7 @@ http:
   middlewares:
     headerRewrite:
       plugin:
-        header-rewrite-traefik-plugin:
+        header-rewrite:
           from: X-Forwarded-Access-Token
           to: Authorization
           prefix: 'Bearer '
