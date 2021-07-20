@@ -1,4 +1,4 @@
-# header-rewrite-proxy
+# Header rewrite Traefik plugin
 
 Traefik plugin that can modify http headers.
 
@@ -21,8 +21,8 @@ Traefik static configuration for local plugin:
 ...
 experimental:
   localPlugins:
-    header-rewrite-proxy:
-      moduleName: github.com/che-incubator/header-rewrite-proxy
+    header-rewrite-traefik-plugin:
+      moduleName: github.com/che-incubator/header-rewrite-traefik-plugin
 ```
 
 Plugin is then configured as a route middleware
@@ -34,7 +34,7 @@ http:
   middlewares:
     headerRewrite:
       plugin:
-        header-rewrite-proxy:
+        header-rewrite-traefik-plugin:
           from: X-Forwarded-Access-Token
           to: Authorization
           prefix: 'Bearer '

@@ -8,7 +8,7 @@
 // Contributors:
 //   Red Hat, Inc. - initial API and implementation
 //
-package header_rewrite_proxy
+package header_rewrite_traefik_plugin
 
 import (
 	"net/http"

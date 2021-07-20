@@ -1,10 +1,11 @@
-displayName: HeaderRewriteProxy
+displayName: Header Rewrite
 summary: Modify http headers
 type: middleware
-import: github.com/che-incubator/header-rewrite-proxy
+import: github.com/che-incubator/header-rewrite-traefik-plugin
 compatibility: TODO
 testData:
   from: X-Forwarded-Access-Token
   to: Authorization
   prefix: 'Bearer '
   keepOriginal: false
+  keepOriginalTarget: true
