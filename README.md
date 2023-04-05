@@ -13,6 +13,9 @@ experimental:
       moduleName: github.com/che-incubator/header-rewrite-traefik-plugin
 ```
 
+
+
+
 Plugin is then configured as a route middleware
 ```.yaml
 http:
