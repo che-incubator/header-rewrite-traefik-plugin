@@ -46,3 +46,8 @@ from `X-Forwarded-Access-Token` and set it into `Authorization` header with `Bea
 Note: Upstream [oauth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) can do what we need, so
 we don't need this component on Kubernetes. Some guys has made an effort to port this feature into
 OpenShift fork, but it was rejected.
+
+
+### Trademark
+
+"Che" is a trademark of the Eclipse Foundation.
